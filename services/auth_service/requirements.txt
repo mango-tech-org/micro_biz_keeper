@@ -1,21 +1,31 @@
-asgiref==3.7.2
-backports.zoneinfo==0.2.1
-Django==3.2.25
-djangorestframework==3.15.1
-djangorestframework-simplejwt==5.3.0
-exceptiongroup==1.2.2
-grpcio==1.62.3
-grpcio-tools==1.62.3
-gunicorn==23.0.0
-importlib-metadata==6.7.0
-iniconfig==2.0.0
-packaging==24.0
-pluggy==1.2.0
-protobuf==4.24.4
-PyJWT==2.8.0
-pytest==7.4.4
-pytz==2024.1
-sqlparse==0.4.4
-tomli==2.0.1
-typing-extensions==4.7.1
-zipp==3.15.0
+# Django framework and REST API
+Django>=3.2,<4.0
+djangorestframework>=3.12.4
+
+# JWT authentication
+djangorestframework-simplejwt>=5.0.0
+
+# gRPC
+grpcio>=1.39.0
+grpcio-tools>=1.39.0
+
+# Django extensions for gRPC support
+django-grpc-framework>=0.1.0
+
+# Python typing extensions (if needed)
+typing-extensions>=3.10.0.0
+
+# PostgreSQL support (if using PostgreSQL in production)
+psycopg2-binary>=2.9.1
+
+# Timezone support (needed for some environments)
+backports.zoneinfo>=0.2.1; python_version < '3.9'
+
+# Testing tools
+pytest>=6.2.4
+pytest-django>=4.4.0
+
+# Linting and code formatting tools (optional)
+black>=21.5b0
+flake8>=3.9.2
+isort>=5.9.3

@@ -1,0 +1,13 @@
+# deployments/k8s/auth_service-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth-service
+  ports:
+    - protocol: TCP
+      port: 50051
+      targetPort: 50051
+  type: LoadBalancer
