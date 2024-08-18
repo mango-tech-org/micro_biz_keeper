@@ -1,0 +1,7 @@
+# Ignore Python bytecode files
+*.py[cod]
+__pycache__/
+
+# Ignore other unnecessary files
+*.pyo
+*.pyd
