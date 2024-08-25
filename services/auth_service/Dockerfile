@@ -15,11 +15,23 @@ RUN pip install --upgrade pip
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+# Install Gunicorn
+RUN pip install gunicorn
+
+
+# Make ports available to the world outside this container
+EXPOSE 8000 50051
 
 # Define environment variable
 ENV PYTHONUNBUFFERED=1
 
-# Run the gRPC server
-CMD ["python", "auth_service/grpc_server.py"]
+# Copy the start script and make it executable
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Use argument to set environment (default to dev)
+ARG DJANGO_ENV=dev
+ENV DJANGO_ENV=$DJANGO_ENV
+
+# Command to start the appropriate environment
+CMD ["/start.sh"]

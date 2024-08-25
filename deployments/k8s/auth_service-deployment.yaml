@@ -1,10 +1,7 @@
-# deployments/k8s/auth_service-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-service
-  labels:
-    app: auth-service
 spec:
   replicas: 2
   selector:
@@ -17,9 +14,29 @@ spec:
     spec:
       containers:
       - name: auth-service
-        image: wanyaland/microbizkeeper_auth_service:latest
+        image: wanyaland/microbizkeeper_auth_service_dev:latest  # Replace with your actual Docker image name
         ports:
-        - containerPort: 50051
+        - containerPort: 8000  # Django REST API port
+        - containerPort: 50051 # gRPC service port
         env:
-        - name: DJANGO_SETTINGS_MODULE
-          value: auth_service.settings
+        - name: DJANGO_ENV
+          value: "dev"  
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+        # livenessProbe:
+        #   httpGet:
+        #     path: /api/health  # Replace with an actual health endpoint
+        #     port: 8000
+        #   initialDelaySeconds: 60
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /api/health  # Replace with an actual health endpoint
+        #     port: 8000
+        #   initialDelaySeconds: 60
+        #   periodSeconds: 10

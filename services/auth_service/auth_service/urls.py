@@ -13,11 +13,27 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from custom_auth.views import UserViewSet
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path
 from django.urls.conf import include
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r"users", UserViewSet)
+
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('auth/', include('custom_auth.urls'))
-]
+    path("admin/", admin.site.urls),
+    path("api/", include(router.urls)),
+    path("api/auth/", include("custom_auth.urls")),
+    path("api/health/", health_check),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
