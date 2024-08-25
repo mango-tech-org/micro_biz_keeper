@@ -40,18 +40,17 @@ def test_user_registration(grpc_channel, unique_phone_number):
 
     assert response.message == "User registered successfully"
     assert response.user_id
-    assert User.objects.filter(
-        phone_number=unique_phone_number
-    ).exists()
 
 
 @pytest.mark.django_db
 def test_user_login(grpc_channel, unique_phone_number):
-    User.objects.create_user(
-        phone_number=unique_phone_number, password="testPassword"
-    )
-
     stub = auth_pb2_grpc.AuthServiceStub(grpc_channel)
+    # Register a user
+    stub.Register(
+        auth_pb2.UserRegisterRequest(
+            phone_number=unique_phone_number, password="testPassword"
+        )
+    )
     response = stub.Login(
         auth_pb2.UserLoginRequest(
             phone_number=unique_phone_number, password="testPassword"

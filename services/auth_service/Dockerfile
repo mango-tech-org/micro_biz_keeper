@@ -25,13 +25,12 @@ EXPOSE 8000 50051
 # Define environment variable
 ENV PYTHONUNBUFFERED=1
 
-# Copy the start script and make it executable
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+# Make it executable
+RUN chmod +x /app/start.sh
 
 # Use argument to set environment (default to dev)
 ARG DJANGO_ENV=dev
 ENV DJANGO_ENV=$DJANGO_ENV
 
 # Command to start the appropriate environment
-CMD ["/start.sh"]
+CMD ["/app/start.sh"]

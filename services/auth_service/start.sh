@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# Start the gRPC server in the background and log the start
-echo "Starting gRPC server..."
-python auth_service/grpc_server.py &
-GRPC_SERVER_PID=$!
+# Function to start GRPC server
+start_grpc_server() {
+    echo "Starting gRPC server..."
+    python auth_service/grpc_server.py &
+    GRPC_SERVER_PID=$!
+}
+
 
 # Check the environment and start the appropriate Django server
 if [ "$DJANGO_ENV" = "dev" ]; then
@@ -11,11 +14,17 @@ if [ "$DJANGO_ENV" = "dev" ]; then
     gunicorn --workers 3 --bind 0.0.0.0:8000 --reload --env DJANGO_SETTINGS_MODULE=auth_service.settings auth_service.wsgi:application &
     DJANGO_SERVER_PID=$!
     echo "Django development server (Gunicorn) started with PID $DJANGO_SERVER_PID"
+
+    # Start the gRPC server
+    start_grpc_server
 else
     echo "Starting Django production server with Gunicorn..."
     gunicorn --workers 3 --bind 0.0.0.0:8000 --env DJANGO_SETTINGS_MODULE=auth_service.settings auth_service.wsgi:application &
     DJANGO_SERVER_PID=$!
     echo "Django production server (Gunicorn) started with PID $DJANGO_SERVER_PID"
+
+    # Start the gRPC server
+    start_grpc_server
 fi
 
 # Function to gracefully shut down both servers
@@ -25,6 +34,7 @@ shutdown_servers() {
     echo "Shutting down gRPC server..."
     kill $GRPC_SERVER_PID
 }
+
 
 # Trap signals to ensure both servers are shut down properly
 trap shutdown_servers SIGTERM SIGINT
