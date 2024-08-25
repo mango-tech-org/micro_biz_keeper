@@ -29,3 +29,5 @@ pytest-django>=4.4.0
 black>=21.5b0
 flake8>=3.9.2
 isort>=5.9.3
+
+grpcio-reflection>=1.39.0

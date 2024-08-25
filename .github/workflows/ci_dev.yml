@@ -47,9 +47,10 @@ jobs:
     
     - name : Run tests
       run: |
-        pytest
+        pytest -vv
     
     - name : Build docker image
+      working-directory: ./services/auth_service
       run: |
-        docker build -t micro_biz/auth_service_dev:ci -f services/auth_service/Dockerfile .
+        docker build -t micro_biz_keeper/auth_service_dev  --build-arg DJANGO_ENV=dev .
 

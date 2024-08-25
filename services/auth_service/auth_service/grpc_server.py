@@ -1,21 +1,22 @@
 # auth_service/grpc_server.py
 import os
 import sys
-import grpc
-import django
-from django.contrib.auth import get_user_model
 from concurrent import futures
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from auth_service.grpc_pb import auth_pb2, auth_pb2_grpc
-# Set up Django environment
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+
+import django
+import grpc
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "auth_service.settings")
 django.setup()
-
-
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from django.contrib.auth import get_user_model  # noqa: E402
+from grpc_reflection.v1alpha import reflection  # noqa: E402
+from rest_framework_simplejwt.tokens import (  # noqa: E402
+    RefreshToken,
+    TokenError,
 )
 
+from auth_service.grpc_pb import auth_pb2, auth_pb2_grpc  # noqa: E402
 
 User = get_user_model()
 
@@ -86,9 +87,14 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    auth_pb2_grpc.add_AuthServiceServicer_to_server(
-        AuthService(), server
+    auth_pb2_grpc.add_AuthServiceServicer_to_server(AuthService(), server)
+
+    SERVICE_NAMES = (
+        reflection.SERVICE_NAME,
+        auth_pb2.DESCRIPTOR.services_by_name["AuthService"].full_name,
     )
+
+    reflection.enable_server_reflection(SERVICE_NAMES, server)
     server.add_insecure_port("[::]:50051")
     server.start()
     print("gRPC server started on port 50051")
