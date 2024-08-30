@@ -25,7 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-&*azdfkv0ekl0@i04^337b!2db6k^d^&*4#$au4x3$@(-_sd(u"
+SECRET_KEY = (
+    "django-insecure-&*azdfkv0ekl0@i04^337b!2db6k^d^&*4#$au4x3$@(-_sd(u"
+)
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "custom_auth",
+    "oauth2_provider",
 ]
 
 MIDDLEWARE = [
@@ -54,6 +57,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -156,9 +160,16 @@ AUTH_USER_MODEL = "custom_auth.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+}
+
+OAUTH2_PROVIDER = {
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 36000,
+    "AUTHORIZATION_CODE_EXPIRE_SECONDS": 360,
+    "OAUTH2_BACKEND_CLASS": "oauth2_provider.oauth2_backends.JSONOAuthLibCore",
+    "SCOPES": {"read": "Read scope", "write": "Write scope"},
 }

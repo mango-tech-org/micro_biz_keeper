@@ -1,10 +1,18 @@
+import os
+
 from django.contrib.auth import get_user_model
+import dotenv
 from rest_framework import generics, serializers, status, viewsets
 from rest_framework.response import Response
 
-from .serializers import UserLoginSerializer, UserRegistrationSerializer
+from .serializers import UserRegistrationSerializer
 
 User = get_user_model()
+
+dotenv.load_dotenv()
+
+oauth2_client_id = os.getenv("OAUTH2_CLIENT_ID")
+oauth2_client_secret = os.getenv("OAUTH2_CLIENT_SECRET")
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -34,14 +42,3 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = []
-
-
-class UserLoginView(generics.CreateAPIView):
-    serializer_class = UserLoginSerializer
-    permission_classes = []
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        tokens = serializer.save()
-        return Response(tokens, status=status.HTTP_200_OK)

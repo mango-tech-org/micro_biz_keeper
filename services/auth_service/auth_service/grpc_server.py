@@ -4,9 +4,12 @@ import sys
 from concurrent import futures
 
 import django
+from dotenv import load_dotenv
 import grpc
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "auth_service.settings")
 django.setup()
 from django.contrib.auth import get_user_model  # noqa: E402
@@ -18,6 +21,11 @@ from rest_framework_simplejwt.tokens import (  # noqa: E402
 
 from auth_service.grpc_pb import auth_pb2, auth_pb2_grpc  # noqa: E402
 
+load_dotenv()
+
+OAUTH2_CLIENT_ID = os.getenv("OAUTH2_CLIENT_ID")
+OAUTH2_CLIENT_SECRET = os.getenv("OAUTH2_CLIENT_SECRET")
+
 User = get_user_model()
 
 
@@ -25,6 +33,13 @@ class AuthService(auth_pb2_grpc.AuthServiceServicer):
 
     def Register(self, request, context):
         try:
+            if request.password != request.repeat_password:
+                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+                context.set_details("Passwords do not match")
+                return auth_pb2.UserRegisterResponse(
+                    user_id="",
+                    message="Passwords do not match",
+                )
             user = User.objects.create_user(
                 phone_number=request.phone_number,
                 password=request.password,

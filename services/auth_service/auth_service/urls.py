@@ -36,4 +36,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api/auth/", include("custom_auth.urls")),
     path("api/health/", health_check),
+    path(
+        "o/", include("oauth2_provider.urls", namespace="oauth2_provider")
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

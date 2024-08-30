@@ -1,5 +1,6 @@
-from custom_auth.views import UserLoginView, UserRegistrationView
+from custom_auth.views import UserRegistrationView
 from django.urls import path
+from oauth2_provider.views import TokenView
 
 urlpatterns = [
     path(
@@ -7,5 +8,5 @@ urlpatterns = [
         UserRegistrationView.as_view(),
         name="register-user",
     ),
-    path("login/", UserLoginView.as_view(), name="login-user"),
+    path("o/token/", TokenView.as_view(), name="token"),
 ]
