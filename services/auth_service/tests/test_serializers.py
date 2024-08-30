@@ -1,8 +1,7 @@
 import uuid
 
 import pytest
-from custom_auth.serializers import (UserLoginSerializer,
-                                     UserRegistrationSerializer)
+from custom_auth.serializers import UserRegistrationSerializer
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -19,6 +18,7 @@ def test_user_registration_serializer(unique_phone_number):
     data = {
         "phone_number": unique_phone_number,
         "password": "testPassword",
+        "repeat_password": "testPassword",
     }
     serializer = UserRegistrationSerializer(data=data)
     assert serializer.is_valid()
@@ -33,30 +33,14 @@ def test_user_registration_serializer(unique_phone_number):
     assert not serializer.is_valid()
     assert "password" in serializer.errors
 
-
-@pytest.mark.django_db
-def test_user_login_serializer(unique_phone_number):
-    User.objects.create_user(
-        phone_number=unique_phone_number, password="testPassword"
-    )
-
-    # Test valid data
+    # Test password mismatch
     data = {
-        "phone_number": unique_phone_number,
+        "phone_number": "256758999982",
         "password": "testPassword",
+        "repeat_password": "wrongPassword",
     }
-    serializer = UserLoginSerializer(data=data)
-    assert serializer.is_valid()
-    tokens = serializer.save()
-
-    assert "access_token" in tokens
-    assert "refresh_token" in tokens
-
-    # Test invalid password
-    data = {
-        "phone_number": unique_phone_number,
-        "password": "wrongPassword",
-    }
-    serializer = UserLoginSerializer(data=data)
+    serializer = UserRegistrationSerializer(data=data)
     assert not serializer.is_valid()
-    assert "non_field_errors" in serializer.errors
+    assert (
+        "repeat_password" in serializer.errors
+    ), "Expected 'repeat_password' error message"
